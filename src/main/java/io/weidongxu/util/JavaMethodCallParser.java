@@ -55,8 +55,10 @@ public class JavaMethodCallParser {
 
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
         combinedTypeSolver.add(new ReflectionTypeSolver(false));
-        for (String referenceProject : configure.getReferenceProjects()) {
-            combinedTypeSolver.add(new JavaParserTypeSolver(Path.of(referenceProject)));
+        if (configure.getReferenceProjects() != null) {
+            for (String referenceProject : configure.getReferenceProjects()) {
+                combinedTypeSolver.add(new JavaParserTypeSolver(Path.of(referenceProject)));
+            }
         }
 
         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(combinedTypeSolver);
@@ -100,26 +102,33 @@ public class JavaMethodCallParser {
                     if ((methodName.startsWith("is") && methodName.length() > 2)
                             || (methodName.startsWith("get") && methodName.length() > 3)
                             || (methodName.startsWith("set") && methodName.length() > 3)) {
-                        int lineNumber = n.getBegin().get().line;
-                        logger.info("Candidate method call: line {}, {}", lineNumber, methodName);
+                        int lineNumberBegin = n.getBegin().get().line;
+                        int lineNumberEnd = n.getEnd().get().line;
+                        logger.info("Candidate method call: line {}-{}, {}", lineNumberBegin, lineNumberEnd, methodName);
                         try {
                             SymbolReference<ResolvedMethodDeclaration> methodReference = parserFacade.solve(n);
                             if (methodReference.isSolved()) {
                                 ResolvedMethodDeclaration resolvedMethodDeclaration = methodReference.getCorrespondingDeclaration();
                                 String fullClassName = resolvedMethodDeclaration.declaringType().getId();
-                                MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
+                                MethodInfo methodCall = new MethodInfo(javaFile, lineNumberBegin, methodName,
                                         fullClassName);
                                 methodCalls.add(methodCall);
+                                if (lineNumberBegin != lineNumberEnd) {
+                                    methodCall = new MethodInfo(javaFile, lineNumberEnd, methodName,
+                                            fullClassName);
+                                    methodCalls.add(methodCall);
+                                }
                             }
                         } catch (UnsolvedSymbolException e) {
-                            if (e.getName() != null && e.getName().contains("inner")
-                                    && !knownResourceMethods.contains(methodName)) {
-                                MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
-                                        "Inner");
-                                methodCalls.add(methodCall);
-                            } else {
-                                aggregatedExceptions.add(e);
-                            }
+//                            if (e.getName() != null && e.getName().contains("inner")
+//                                    && !knownResourceMethods.contains(methodName)) {
+//                                MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
+//                                        "Inner");
+//                                methodCalls.add(methodCall);
+//                            } else {
+//                                aggregatedExceptions.add(e);
+//                            }
+                            aggregatedExceptions.add(e);
                         } catch (StackOverflowError e) {
                             aggregatedExceptions.add(e);
                             arg.abort = true;

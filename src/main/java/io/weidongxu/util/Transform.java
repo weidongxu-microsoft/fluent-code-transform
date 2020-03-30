@@ -42,8 +42,10 @@ public class Transform {
 
         JavaMethodCallParser parser = new JavaMethodCallParser(configure, Transform::fileIsGenerated);
         walkJavaFiles(Path.of(configure.getProjectLocation()), parser::processJavaFile);
-        for (String additionalProject : configure.getAdditionalProjects()) {
-            walkJavaFiles(Path.of(additionalProject), parser::processJavaFile);
+        if (configure.getAdditionalProjects() != null) {
+            for (String additionalProject : configure.getAdditionalProjects()) {
+                walkJavaFiles(Path.of(additionalProject), parser::processJavaFile);
+            }
         }
 
         generatedClasses.add("Inner");
