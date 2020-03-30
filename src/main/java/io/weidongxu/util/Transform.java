@@ -46,6 +46,8 @@ public class Transform {
             walkJavaFiles(Path.of(additionalProject), parser::processJavaFile);
         }
 
+        generatedClasses.add("Inner");
+
         List<MethodInfo> methodCalls = parser.getMethodCalls();
         Map<Path, List<MethodInfo>> methodCallsGroupedByPath = methodCalls.stream()
                 .filter(c -> generatedClasses.contains(c.getRefClassName()))
@@ -59,7 +61,13 @@ public class Transform {
                 CompilationUnit cu = StaticJavaParser.parse(javaFile);
                 String packageName = cu.getPackageDeclaration().get().getName().toString();
                 String className = javaFile.getFileName().toString().replace(".java", "");
-                generatedClasses.add(packageName + "." + className);
+
+                boolean isMethodGroup = cu.getImports().stream()
+                        .anyMatch(d -> "com.azure.core.annotation.ServiceInterface".equals(d.getName().toString()));
+
+                if (!isMethodGroup) {
+                    generatedClasses.add(packageName + "." + className);
+                }
             }
         } catch (IOException e) {
             //
@@ -91,6 +99,8 @@ public class Transform {
 
                 String line;
                 while ((line = br.readLine()) != null) {
+                    ++lineNumber;
+
                     if (methodCall != null && methodCall.getLineNumber() < lineNumber) {
                         if (iterator.hasNext()) {
                             methodCall = iterator.next();
@@ -117,7 +127,6 @@ public class Transform {
                     }
 
                     lines.add(line);
-                    ++lineNumber;
                 }
             }
 

@@ -9,6 +9,7 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
@@ -21,7 +22,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class JavaMethodCallParser {
@@ -35,6 +38,17 @@ public class JavaMethodCallParser {
 
     private final List<MethodInfo> methodCalls = new ArrayList<>();
     private final List<Throwable> aggregatedExceptions = new ArrayList<>();
+
+    private static final Set<String> knownResourceMethods = new HashSet<>();
+    static {
+        knownResourceMethods.add("getId");
+        knownResourceMethods.add("getName");
+        knownResourceMethods.add("getType");
+        knownResourceMethods.add("getLocation");
+        knownResourceMethods.add("getTags");
+        knownResourceMethods.add("setLocation");
+        knownResourceMethods.add("setTags");
+    }
 
     public JavaMethodCallParser(Configure configure, Function<? super Path, Boolean> fileIsGenerated) {
         this.fileIsGenerated = fileIsGenerated;
@@ -98,7 +112,14 @@ public class JavaMethodCallParser {
                                 methodCalls.add(methodCall);
                             }
                         } catch (UnsolvedSymbolException e) {
-                            aggregatedExceptions.add(e);
+                            if (e.getName() != null && e.getName().contains("inner")
+                                    && !knownResourceMethods.contains(methodName)) {
+                                MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
+                                        "Inner");
+                                methodCalls.add(methodCall);
+                            } else {
+                                aggregatedExceptions.add(e);
+                            }
                         } catch (StackOverflowError e) {
                             aggregatedExceptions.add(e);
                             arg.abort = true;
