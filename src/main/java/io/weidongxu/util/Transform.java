@@ -1,5 +1,7 @@
 package io.weidongxu.util;
 
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +54,15 @@ public class Transform {
     }
 
     private void collectGeneratedClasses(Path javaFile) {
-        if (fileIsGenerated(javaFile)) {
-            generatedClasses.add(javaFile.getFileName().toString().replace(".java", ""));
+        try {
+            if (fileIsGenerated(javaFile)) {
+                CompilationUnit cu = StaticJavaParser.parse(javaFile);
+                String packageName = cu.getPackageDeclaration().get().getName().toString();
+                String className = javaFile.getFileName().toString().replace(".java", "");
+                generatedClasses.add(packageName + "." + className);
+            }
+        } catch (IOException e) {
+            //
         }
     }
 

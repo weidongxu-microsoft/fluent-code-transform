@@ -11,3 +11,5 @@ referenceProjects:
   - 'C:\\github\\azure-sdk-for-java\\sdk\\resources\\mgmt\src\\test\\java'
   - 'C:\\github\\azure-sdk-for-java\\sdk\\authorization\\mgmt\src\\main\\java'
   - 'C:\\github\\azure-sdk-for-java\\sdk\\authorization\\mgmt\src\\test\\java'
+  - 'C:\\github\\azure-sdk-for-java\\sdk\\keyvault\\mgmt\\src\\main\\java'
+  - 'C:\\github\\azure-sdk-for-java\\sdk\\keyvault\\mgmt\\src\\test\\java'

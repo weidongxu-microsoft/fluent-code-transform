@@ -94,7 +94,7 @@ public class JavaMethodCallParser {
                                 ResolvedMethodDeclaration resolvedMethodDeclaration = methodReference.getCorrespondingDeclaration();
                                 String fullClassName = resolvedMethodDeclaration.declaringType().getId();
                                 MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
-                                        fullClassName.substring(fullClassName.lastIndexOf(".") + 1));
+                                        fullClassName);
                                 methodCalls.add(methodCall);
                             }
                         } catch (UnsolvedSymbolException e) {
