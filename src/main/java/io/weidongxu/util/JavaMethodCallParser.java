@@ -82,26 +82,27 @@ public class JavaMethodCallParser {
 
                     super.visit(n, arg);
 
-                    if (!n.getName().getIdentifier().startsWith("get") && !n.getName().getIdentifier().startsWith("set")) {
-                        return;
-                    }
-
                     String methodName = n.getName().getIdentifier();
-                    int lineNumber = n.getBegin().get().line;
-                    logger.info("Candidate method call: line {}, {}", lineNumber, methodName);
-                    try {
-                        SymbolReference<ResolvedMethodDeclaration> methodReference = parserFacade.solve(n);
-                        if (methodReference.isSolved()) {
-                            ResolvedMethodDeclaration resolvedMethodDeclaration = methodReference.getCorrespondingDeclaration();
-                            MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
-                                    resolvedMethodDeclaration.declaringType().getId());
-                            methodCalls.add(methodCall);
+                    if ((methodName.startsWith("is") && methodName.length() > 2)
+                            || (methodName.startsWith("get") && methodName.length() > 3)
+                            || (methodName.startsWith("set") && methodName.length() > 3)) {
+                        int lineNumber = n.getBegin().get().line;
+                        logger.info("Candidate method call: line {}, {}", lineNumber, methodName);
+                        try {
+                            SymbolReference<ResolvedMethodDeclaration> methodReference = parserFacade.solve(n);
+                            if (methodReference.isSolved()) {
+                                ResolvedMethodDeclaration resolvedMethodDeclaration = methodReference.getCorrespondingDeclaration();
+                                String fullClassName = resolvedMethodDeclaration.declaringType().getId();
+                                MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
+                                        fullClassName.substring(fullClassName.lastIndexOf(".") + 1));
+                                methodCalls.add(methodCall);
+                            }
+                        } catch (UnsolvedSymbolException e) {
+                            aggregatedExceptions.add(e);
+                        } catch (StackOverflowError e) {
+                            aggregatedExceptions.add(e);
+                            arg.abort = true;
                         }
-                    } catch (UnsolvedSymbolException e) {
-                        aggregatedExceptions.add(e);
-                    } catch (StackOverflowError e) {
-                        aggregatedExceptions.add(e);
-                        arg.abort = true;
                     }
                 }
             };

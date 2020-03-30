@@ -1,10 +1,13 @@
-projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\keyvault\\mgmt\\src'
+projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\storage\\mgmt\\src'
 
 additionalProjects:
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\azure\src\\test\\java'
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\samples\src\\test\\java'
 
 referenceProjects:
+  - 'C:\\github\\azure-sdk-for-java\\sdk\\storage\\mgmt\\src\\main\\java'
+  - 'C:\\github\\azure-sdk-for-java\\sdk\\storage\\mgmt\\src\\test\\java'
   - 'C:\\github\\azure-sdk-for-java\\sdk\\resources\\mgmt\src\\main\\java'
   - 'C:\\github\\azure-sdk-for-java\\sdk\\resources\\mgmt\src\\test\\java'
-  - 'C:\\github\\azure-sdk-for-java\\sdk\\keyvault\\mgmt\\src\\main\\java'
+  - 'C:\\github\\azure-sdk-for-java\\sdk\\authorization\\mgmt\src\\main\\java'
+  - 'C:\\github\\azure-sdk-for-java\\sdk\\authorization\\mgmt\src\\test\\java'

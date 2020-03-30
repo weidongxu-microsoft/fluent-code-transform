@@ -94,6 +94,8 @@ public class Transform {
                         String methodName = methodCall.getMethodName();
                         String replaceMethodName = methodName.startsWith("set")
                                 ? "with" + methodName.substring(3)
+                                : methodName.startsWith("is")
+                                ? methodName.substring(2, 3).toLowerCase() + methodName.substring(3)
                                 : methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
 
                         line = line.replace(methodName, replaceMethodName);
@@ -105,6 +107,7 @@ public class Transform {
                         }
                     }
 
+                    lines.add(line);
                     ++lineNumber;
                 }
             }
