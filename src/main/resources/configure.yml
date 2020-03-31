@@ -1,4 +1,4 @@
-projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\storage\\mgmt\\src\\'
+projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\authorization\\mgmt\\src\\'
 
 additionalProjects:
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\azure\src\\test\\java\\'
@@ -6,6 +6,6 @@ additionalProjects:
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\samples\src\\test\\java\\'
 
 referenceProjects:
-  - 'C:\\github\\azure-sdk-for-java\\sdk\\storage\\mgmt\\src\\test\\java\\'
+  - 'C:\\github\\azure-sdk-for-java\\sdk\\authorization\\mgmt\\src\\test\\java\\'
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\azure\\src\\test\\java\\'
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\samples\src\\test\\java\\'

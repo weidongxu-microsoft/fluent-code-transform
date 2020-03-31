@@ -9,7 +9,6 @@ import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
@@ -38,17 +37,6 @@ public class JavaMethodCallParser {
 
     private final List<MethodInfo> methodCalls = new ArrayList<>();
     private final List<Throwable> aggregatedExceptions = new ArrayList<>();
-
-    private static final Set<String> knownResourceMethods = new HashSet<>();
-    static {
-        knownResourceMethods.add("getId");
-        knownResourceMethods.add("getName");
-        knownResourceMethods.add("getType");
-        knownResourceMethods.add("getLocation");
-        knownResourceMethods.add("getTags");
-        knownResourceMethods.add("setLocation");
-        knownResourceMethods.add("setTags");
-    }
 
     public JavaMethodCallParser(Configure configure, Function<? super Path, Boolean> fileIsGenerated) {
         this.fileIsGenerated = fileIsGenerated;
@@ -99,9 +87,10 @@ public class JavaMethodCallParser {
                     super.visit(n, arg);
 
                     String methodName = n.getName().getIdentifier();
-                    if ((methodName.startsWith("is") && methodName.length() > 2)
+                    if (!"getId".equals(methodName)
+                            && ((methodName.startsWith("is") && methodName.length() > 2)
                             || (methodName.startsWith("get") && methodName.length() > 3)
-                            || (methodName.startsWith("set") && methodName.length() > 3)) {
+                            || (methodName.startsWith("set") && methodName.length() > 3))) {
                         int lineNumberBegin = n.getBegin().get().line;
                         int lineNumberEnd = n.getEnd().get().line;
                         logger.info("Candidate method call: line {}-{}, {}", lineNumberBegin, lineNumberEnd, methodName);
@@ -119,17 +108,9 @@ public class JavaMethodCallParser {
                                     methodCalls.add(methodCall);
                                 }
                             }
-                        } catch (UnsolvedSymbolException e) {
-//                            if (e.getName() != null && e.getName().contains("inner")
-//                                    && !knownResourceMethods.contains(methodName)) {
-//                                MethodInfo methodCall = new MethodInfo(javaFile, lineNumber, methodName,
-//                                        "Inner");
-//                                methodCalls.add(methodCall);
-//                            } else {
-//                                aggregatedExceptions.add(e);
-//                            }
+                        } catch (RuntimeException e) {
                             aggregatedExceptions.add(e);
-                        } catch (StackOverflowError e) {
+                        } catch (StackOverflowError | NoClassDefFoundError e) {
                             aggregatedExceptions.add(e);
                             arg.abort = true;
                         }

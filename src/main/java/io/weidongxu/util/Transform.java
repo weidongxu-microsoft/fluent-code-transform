@@ -48,7 +48,10 @@ public class Transform {
             }
         }
 
-        generatedClasses.add("Inner");
+        List<Throwable> exceptions = parser.getAggregatedExceptions();
+        if (!exceptions.isEmpty()) {
+            logger.warn("Count of exceptions: {}", exceptions.size());
+        }
 
         List<MethodInfo> methodCalls = parser.getMethodCalls();
         Map<Path, List<MethodInfo>> methodCallsGroupedByPath = methodCalls.stream()
