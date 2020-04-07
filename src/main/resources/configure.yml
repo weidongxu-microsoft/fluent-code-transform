@@ -1,4 +1,6 @@
-projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\authorization\\mgmt\\src\\'
+procedure: format
+
+projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\resources\\mgmt\\src\\'
 
 additionalProjects:
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\azure\src\\test\\java\\'

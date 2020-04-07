@@ -2,6 +2,9 @@ package io.weidongxu.util;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.google.common.base.Charsets;
+import com.google.googlejavaformat.java.Formatter;
+import com.google.googlejavaformat.java.FormatterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +41,22 @@ public class Transform {
     }
 
     public void process() throws IOException {
+        switch (configure.getProcedure()) {
+            case "format":
+                this.processFormat();
+                break;
+
+            case "modify_method":
+                this.processModifyMethod();
+                break;
+        }
+    }
+
+    private void processFormat() throws IOException {
+        walkJavaFiles(Path.of(configure.getProjectLocation()), this::formatJavaFile);
+    }
+
+    private void processModifyMethod() throws IOException {
         walkJavaFiles(Path.of(configure.getProjectLocation()), this::collectGeneratedClasses);
 
         JavaMethodCallParser parser = new JavaMethodCallParser(configure, Transform::fileIsGenerated);
@@ -58,6 +77,16 @@ public class Transform {
                 .filter(c -> generatedClasses.contains(c.getRefClassName()))
                 .collect(Collectors.groupingBy(MethodInfo::getPath));
         methodCallsGroupedByPath.forEach(this::replaceInFile);
+    }
+
+    private void formatJavaFile(Path javaFile) {
+        try {
+            String content = com.google.common.io.Files.toString(javaFile.toFile(), Charsets.UTF_8);
+            String code = new Formatter().formatSourceAndFixImports(content);
+            writeToFile(javaFile, code);
+        } catch (IOException | FormatterException e) {
+            logger.warn("Exception", e);
+        }
     }
 
     private void collectGeneratedClasses(Path javaFile) {
