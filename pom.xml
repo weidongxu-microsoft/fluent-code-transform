@@ -11,7 +11,7 @@
   <repositories>
     <repository>
       <id>azuresdkmaven</id>
-      <url>https://azuresdkmaven.blob.core.windows.net/snapshot/m2</url>
+      <url>https://azuresdkmaven.blob.core.windows.net/maven2</url>
     </repository>
   </repositories>
 
