@@ -1,6 +1,6 @@
 procedure: format
 
-projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\resources\\mgmt\\src\\'
+projectLocation: 'C:\\github\\azure-sdk-for-java\\sdk\\resourcemanager\\'
 
 additionalProjects:
   - 'C:\\github\\azure-sdk-for-java\\sdk\\management\\azure\src\\test\\java\\'
